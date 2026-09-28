@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Sushii (Muffinn) 💖</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sacramento&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.com/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'rose-pink': '#FFB6C1',
+                        'soft-pink': '#FFF0F5',
+                        'blush': '#FFE4E1',
+                        'romantic-red': '#E63946',
+                        'gold-accent': '#D4AF37',
+                        'deep-rose': '#C71585',
+                        'champagne': '#FDF5E6'
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        script: ['"Dancing Script"', 'cursive'],
+                        handwriting: ['"Caveat"', 'cursive'],
+                        sacramento: ['"Sacramento"', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fff5f7;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f4a261;
+            border-radius: 10px;
+        }
+
+        @keyframes floatHeart {
+            0% {
+                transform: translateY(105vh) scale(0.5) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .floating-heart {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1;
+            animation: floatHeart 12s linear infinite;
+        }
+
+        @keyframes flamePulse {
+            0%, 100% { transform: scale(1) rotate(-2deg); opacity: 0.9; }
+            50% { transform: scale(1.18) rotate(2deg); opacity: 1; filter: drop-shadow(0 0 15px #ff8c00); }
+        }
+
+        .flame-active {
+            animation: flamePulse 1.2s ease-in-out infinite;
+        }
+
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 192, 203, 0.45);
+        }
+
+        .polaroid-frame {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .polaroid-frame:hover {
+            transform: translateY(-10px) rotate(0deg) scale(1.03) !important;
+            box-shadow: 0 20px 30px rgba(230, 57, 70, 0.18);
+        }
+
+        @keyframes musicalNoteFloat {
+            0% { transform: translateY(0) scale(0.8); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-30px) scale(1.2); opacity: 0; }
+        }
+        .note-float {
+            animation: musicalNoteFloat 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-soft-pink via-blush to-champagne min-h-screen text-slate-800 font-sans relative overflow-x-hidden" id="mainBody">
+
+    <!-- Floating Hearts Background Container -->
+    <div id="heartsContainer" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+    <!-- AUDIO PLAYER HEADER -->
+    <header class="sticky top-0 z-50 glass-card border-b border-rose-200/50 shadow-sm py-3 px-4">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-rose-500 text-white flex items-center justify-center animate-bounce shadow-md">
+                    <i class="fa-solid fa-heart text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-script text-2xl font-bold text-rose-600">For My Dearest Sushii (Muffinn)</h1>
+                    <p class="text-xs text-rose-400 font-medium">Playing: PARTYNEXTDOOR – Some of Your Love 🎵</p>
+                </div>
+            </div>
+
+            <!-- Audio Control Button -->
+            <div class="flex items-center gap-3 bg-white/80 px-4 py-2 rounded-full border border-rose-200 shadow-inner">
+                <button id="musicToggleBtn" onclick="toggleMusic()" class="flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white text-xs font-semibold rounded-full transition-all duration-300 shadow-md transform active:scale-95">
+                    <i id="playIcon" class="fa-solid fa-play"></i>
+                    <span id="musicStatusText">Play Music</span>
+                </button>
+                <div id="noteAnim" class="hidden flex gap-1 text-rose-500 text-xs">
+                    <i class="fa-solid fa-music note-float"></i>
+                    <i class="fa-solid fa-notes-medical note-float" style="animation-delay: 0.5s;"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Embedded YouTube Player -->
+    <iframe id="ytPlayer" class="hidden" width="100" height="100" 
+        src="https://www.youtube.com/embed/5LByH1X2_hY?enablejsapi=1&autoplay=0&loop=1&playlist=5LByH1X2_hY" 
+        allow="autoplay; encrypted-media">
+    </iframe>
+
+    <main class="max-w-5xl mx-auto px-4 py-8 relative z-10 space-y-16">
+
+        <!-- HERO SECTION -->
+        <section class="text-center space-y-6 pt-4">
+            <div class="inline-block px-4 py-1.5 bg-rose-100 text-rose-700 text-xs font-semibold uppercase tracking-widest rounded-full shadow-sm mb-2">
+                ✨ June 8th • The Day Everything Transformed ✨
+            </div>
+            <h1 class="font-script text-5xl sm:text-7xl md:text-8xl text-rose-600 drop-shadow-sm leading-tight">
+                Happy Birthday, Sushii! 🎂💖
+            </h1>
+            <p class="font-handwriting text-2xl sm:text-3xl text-rose-700 max-w-2xl mx-auto leading-relaxed">
+                "Counting down every single second until November when I finally get to hold you close..." ✨
+            </p>
+            <div class="pt-4 flex justify-center gap-4 flex-wrap">
+                <button onclick="scrollToSection('loveNoteSection')" class="px-6 py-3 bg-rose-500 hover:bg-rose-600 text-white font-medium text-sm rounded-full shadow-lg hover:shadow-rose-300/50 transition duration-300 transform hover:-translate-y-1">
+                    <i class="fa-solid fa-envelope-open-text mr-2"></i>Read Love Note
+                </button>
+                <button onclick="scrollToSection('cakeSection')" class="px-6 py-3 bg-white text-rose-600 hover:bg-rose-50 font-medium text-sm rounded-full shadow-md border border-rose-200 transition duration-300 transform hover:-translate-y-1">
+                    <i class="fa-solid fa-cake-candles mr-2"></i>Blow Candle
+                </button>
+            </div>
+        </section>
+
+        <!-- MAIN LOVE NOTE SECTION -->
+        <section id="loveNoteSection" class="max-w-3xl mx-auto">
+            <div class="glass-card rounded-3xl p-8 sm:p-12 shadow-xl border border-rose-200 relative overflow-hidden">
+                <div class="absolute -right-12 -top-12 w-40 h-40 bg-rose-200/40 rounded-full filter blur-2xl"></div>
+                <div class="absolute -left-12 -bottom-12 w-40 h-40 bg-pink-200/40 rounded-full filter blur-2xl"></div>
+                
+                <div class="relative z-10 space-y-6 text-slate-700">
+                    <div class="flex items-center justify-between border-b border-rose-200/80 pb-4">
+                        <span class="font-script text-3xl text-rose-600 font-bold">A Birthday Letter For You 💌</span>
+                        <i class="fa-solid fa-heart text-rose-500 text-2xl animate-pulse"></i>
+                    </div>
+
+                    <div class="space-y-5 font-sans text-base sm:text-lg leading-relaxed text-slate-700">
+                        <p class="font-medium text-rose-800 text-xl font-handwriting">
+                            Happy Birthday, my sweetest Sushii (Muffinn) 🎂🥳💖✨
+                        </p>
+                        
+                        <p>
+                            I hope today brings you as much joy, warmth, and brightness as you bring into my life every single day. I just wanted to remind you how utterly beautiful you are and your soft, adorable face, your cute smile that instantly brightens up my whole world, and that sweet, soothing voice of yours that I could listen to forever. Everything about you is so incredibly precious to me.
+                        </p>
+
+                        <p>
+                            Today is all about celebrating you, the most incredible, beautiful, and pure-hearted person in my world. From the moment you came into my life on June 8th, everything transformed. My life went from feeling incomplete to being filled with so much warmth, laughter, and purpose. You brought a kind of magic with you that I thank God for every single day.
+                        </p>
+
+                        <p>
+                            On your special day, I want to promise you total peace, unwavering trust, and a love that stands strong no matter what. You deserve all the happiness, sweetness, and light in the universe today and always. I hate that I’m not right there next to you to give you the biggest hug today, but I am counting down every single second until November when I finally get to hold you close.
+                        </p>
+
+                        <p>
+                            Enjoy your day to the fullest, my dearest Sushii. Smile bright, don't stress about anything, and know that someone over here is completely, head-over-heels in love with you.
+                        </p>
+                    </div>
+
+                    <div class="pt-6 border-t border-rose-200/80 text-right space-y-1">
+                        <p class="font-handwriting text-3xl text-rose-600 font-bold">
+                            Happy Birthday, my sweet girl!
+                        </p>
+                        <p class="font-script text-2xl text-pink-600">
+                            I love you so, so much, forever and always keep smiling ❤️✨
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PHOTO GALLERY -->
+        <section id="gallerySection" class="space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="font-script text-4xl text-rose-600 font-bold">Precious Moments</h2>
+                <p class="text-slate-500 text-sm">Click any photo to open full view ✨</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+                <div onclick="openLightbox(0)" class="polaroid-frame bg-white p-4 rounded-2xl shadow-lg border border-rose-100 transform rotate-[-2deg] cursor-pointer">
+                    <div class="relative overflow-hidden rounded-xl aspect-[3/4] bg-rose-50">
+                        <img id="img-0" src="WhatsApp Image 2026-09-28 at 9.45.53 PM (1).jpeg" alt="Sushii Playful Look" class="w-full h-full object-cover rounded-xl transition duration-500 hover:scale-105">
+                    </div>
+                    <div class="pt-4 text-center">
+                        <p class="font-handwriting text-2xl text-slate-700">Soft & Adorable Face 💖</p>
+                    </div>
+                </div>
+
+                <div onclick="openLightbox(1)" class="polaroid-frame bg-white p-4 rounded-2xl shadow-lg border border-rose-100 transform rotate-[2deg] cursor-pointer">
+                    <div class="relative overflow-hidden rounded-xl aspect-[3/4] bg-rose-50">
+                        <img id="img-1" src="WhatsApp Image 2026-09-28 at 9.45.53 PM (2).jpeg" alt="Sushii Cafe Look" class="w-full h-full object-cover rounded-xl transition duration-500 hover:scale-105">
+                    </div>
+                    <div class="pt-4 text-center">
+                        <p class="font-handwriting text-2xl text-slate-700">Warm Cosy Moments ☕</p>
+                    </div>
+                </div>
+
+                <div onclick="openLightbox(2)" class="polaroid-frame bg-white p-4 rounded-2xl shadow-lg border border-rose-100 transform rotate-[-1deg] cursor-pointer">
+                    <div class="relative overflow-hidden rounded-xl aspect-[3/4] bg-rose-50">
+                        <img id="img-2" src="WhatsApp Image 2026-09-28 at 9.45.53 PM.jpeg" alt="Sushii Stunning Lounge" class="w-full h-full object-cover rounded-xl transition duration-500 hover:scale-105">
+                    </div>
+                    <div class="pt-4 text-center">
+                        <p class="font-handwriting text-2xl text-slate-700">Utterly Beautiful ✨</p>
+                    </div>
+                </div>
+
+                <div onclick="openLightbox(3)" class="polaroid-frame bg-white p-4 rounded-2xl shadow-lg border border-rose-100 transform rotate-[3deg] cursor-pointer">
+                    <div class="relative overflow-hidden rounded-xl aspect-[3/4] bg-rose-50">
+                        <img id="img-3" src="WhatsApp Image 2026-09-28 at 9.45.54 PM (1).jpeg" alt="Sushii Soft Eyes" class="w-full h-full object-cover rounded-xl transition duration-500 hover:scale-105">
+                    </div>
+                    <div class="pt-4 text-center">
+                        <p class="font-handwriting text-2xl text-slate-700">So Incredibly Precious 🌿</p>
+                    </div>
+                </div>
+
+                <div onclick="openLightbox(4)" class="polaroid-frame bg-white p-4 rounded-2xl shadow-lg border border-rose-100 transform rotate-[-2deg] cursor-pointer">
+                    <div class="relative overflow-hidden rounded-xl aspect-[3/4] bg-rose-50">
+                        <img id="img-4" src="WhatsApp Image 2026-09-28 at 9.45.54 PM.jpeg" alt="Sushii Cute Smile" class="w-full h-full object-cover rounded-xl transition duration-500 hover:scale-105">
+                    </div>
+                    <div class="pt-4 text-center">
+                        <p class="font-handwriting text-2xl text-slate-700">Brightens Up Everything 🌺</p>
+                    </div>
+                </div>
+
+                <div onclick="openLightbox(5)" class="polaroid-frame bg-white p-4 rounded-2xl shadow-lg border border-rose-100 transform rotate-[1deg] cursor-pointer">
+                    <div class="relative overflow-hidden rounded-xl aspect-[3/4] bg-rose-50">
+                        <img id="img-5" src="WhatsApp Image 2026-09-28 at 10.36.11 PM.jpeg" alt="Sushii Charming Portrait" class="w-full h-full object-cover rounded-xl transition duration-500 hover:scale-105">
+                    </div>
+                    <div class="pt-4 text-center">
+                        <p class="font-handwriting text-2xl text-slate-700">Most Charming Smile 💕</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LIGHTBOX MODAL -->
+        <div id="lightboxModal" class="fixed inset-0 bg-black/85 z-50 hidden flex items-center justify-center p-4" onclick="closeLightbox()">
+            <div class="relative max-w-2xl max-h-[90vh] p-2" onclick="event.stopPropagation()">
+                <button onclick="closeLightbox()" class="absolute -top-10 right-0 text-white text-2xl hover:text-rose-300">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <img id="lightboxImg" src="" alt="Full View" class="max-w-full max-h-[80vh] rounded-2xl shadow-2xl object-contain mx-auto">
+                <p id="lightboxCaption" class="text-center text-white font-handwriting text-2xl mt-3"></p>
+            </div>
+        </div>
+
+        <!-- REASONS WHY I LOVE YOU (FLIP CARDS) -->
+        <section class="space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="font-script text-4xl text-rose-600 font-bold">Six Things I Love About You</h2>
+                <p class="text-slate-500 text-sm">Tap on any card to reveal why you mean the world to me!</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-4">
+                <div class="h-44 perspective-1000 cursor-pointer" onclick="flipCard(this)">
+                    <div class="card-inner relative w-full h-full transform-style-3d shadow-md rounded-2xl">
+                        <div class="absolute inset-0 bg-white border border-rose-200 rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden text-center">
+                            <i class="fa-solid fa-face-smile text-3xl text-rose-400 mb-2"></i>
+                            <h3 class="font-semibold text-rose-600">Your Smile</h3>
+                            <p class="text-xs text-slate-400 mt-1">Tap to flip ✨</p>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-br from-rose-500 to-pink-500 text-white rounded-2xl flex items-center justify-center p-6 backface-hidden rotate-y-180 text-center">
+                            <p class="text-sm font-medium">Your cute smile instantly brightens up my whole world.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-44 perspective-1000 cursor-pointer" onclick="flipCard(this)">
+                    <div class="card-inner relative w-full h-full transform-style-3d shadow-md rounded-2xl">
+                        <div class="absolute inset-0 bg-white border border-rose-200 rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden text-center">
+                            <i class="fa-solid fa-microphone text-3xl text-rose-400 mb-2"></i>
+                            <h3 class="font-semibold text-rose-600">Your Sweet Voice</h3>
+                            <p class="text-xs text-slate-400 mt-1">Tap to flip ✨</p>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-br from-rose-500 to-pink-500 text-white rounded-2xl flex items-center justify-center p-6 backface-hidden rotate-y-180 text-center">
+                            <p class="text-sm font-medium">That sweet, soothing voice of yours I could listen to forever.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-44 perspective-1000 cursor-pointer" onclick="flipCard(this)">
+                    <div class="card-inner relative w-full h-full transform-style-3d shadow-md rounded-2xl">
+                        <div class="absolute inset-0 bg-white border border-rose-200 rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden text-center">
+                            <i class="fa-solid fa-calendar-heart text-3xl text-rose-400 mb-2"></i>
+                            <h3 class="font-semibold text-rose-600">June 8th Magic</h3>
+                            <p class="text-xs text-slate-400 mt-1">Tap to flip ✨</p>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-br from-rose-500 to-pink-500 text-white rounded-2xl flex items-center justify-center p-6 backface-hidden rotate-y-180 text-center">
+                            <p class="text-sm font-medium">From June 8th, my life went from feeling incomplete to full of warmth & laughter.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-44 perspective-1000 cursor-pointer" onclick="flipCard(this)">
+                    <div class="card-inner relative w-full h-full transform-style-3d shadow-md rounded-2xl">
+                        <div class="absolute inset-0 bg-white border border-rose-200 rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden text-center">
+                            <i class="fa-solid fa-clock text-3xl text-rose-400 mb-2"></i>
+                            <h3 class="font-semibold text-rose-600">November Countdown</h3>
+                            <p class="text-xs text-slate-400 mt-1">Tap to flip ✨</p>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-br from-rose-500 to-pink-500 text-white rounded-2xl flex items-center justify-center p-6 backface-hidden rotate-y-180 text-center">
+                            <p class="text-sm font-medium">Counting down every single second until November when I finally hold you close!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-44 perspective-1000 cursor-pointer" onclick="flipCard(this)">
+                    <div class="card-inner relative w-full h-full transform-style-3d shadow-md rounded-2xl">
+                        <div class="absolute inset-0 bg-white border border-rose-200 rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden text-center">
+                            <i class="fa-solid fa-hand-holding-heart text-3xl text-rose-400 mb-2"></i>
+                            <h3 class="font-semibold text-rose-600">My Promise</h3>
+                            <p class="text-xs text-slate-400 mt-1">Tap to flip ✨</p>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-br from-rose-500 to-pink-500 text-white rounded-2xl flex items-center justify-center p-6 backface-hidden rotate-y-180 text-center">
+                            <p class="text-sm font-medium">I promise you total peace, unwavering trust, and a love that stands strong no matter what.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-44 perspective-1000 cursor-pointer" onclick="flipCard(this)">
+                    <div class="card-inner relative w-full h-full transform-style-3d shadow-md rounded-2xl">
+                        <div class="absolute inset-0 bg-white border border-rose-200 rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden text-center">
+                            <i class="fa-solid fa-heart-circle-check text-3xl text-rose-400 mb-2"></i>
+                            <h3 class="font-semibold text-rose-600">Pure Heart</h3>
+                            <p class="text-xs text-slate-400 mt-1">Tap to flip ✨</p>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-br from-rose-500 to-pink-500 text-white rounded-2xl flex items-center justify-center p-6 backface-hidden rotate-y-180 text-center">
+                            <p class="text-sm font-medium">You are the most incredible, beautiful, and pure-hearted person in my world.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE BIRTHDAY CAKE -->
+        <section id="cakeSection" class="text-center space-y-6 pt-8 pb-12">
+            <div class="glass-card rounded-3xl p-8 sm:p-12 max-w-xl mx-auto border border-rose-200 shadow-xl relative">
+                <h2 class="font-script text-4xl text-rose-600 font-bold mb-2">Blow Out The Candle!</h2>
+                <p class="text-slate-500 text-sm mb-8">Tap on the flame or click the candle to make a birthday wish! 🎉</p>
+
+                <div class="relative w-48 h-48 mx-auto flex flex-col items-center justify-end cursor-pointer group" onclick="blowCandle()">
+                    <div id="candleFlame" class="flame-active w-6 h-8 bg-gradient-to-t from-yellow-500 via-orange-400 to-red-500 rounded-full filter blur-[1px] mb-1 transition-all duration-500"></div>
+                    <div class="w-3 h-14 bg-gradient-to-r from-pink-300 via-white to-pink-300 rounded-t-sm shadow-sm"></div>
+                    <div class="w-32 h-12 bg-gradient-to-r from-rose-300 via-pink-200 to-rose-300 rounded-t-xl border-b-4 border-pink-400 relative">
+                        <div class="absolute top-0 inset-x-0 h-3 bg-white/60 rounded-t-xl"></div>
+                    </div>
+                    <div class="w-44 h-16 bg-gradient-to-r from-rose-400 via-pink-300 to-rose-400 rounded-t-2xl relative shadow-md">
+                        <div class="absolute top-0 inset-x-0 h-4 bg-white/70 rounded-t-2xl"></div>
+                    </div>
+                    <div class="w-52 h-3 bg-slate-200 rounded-full shadow-lg"></div>
+                </div>
+
+                <div id="wishMessage" class="mt-6 text-rose-600 font-script text-3xl font-bold opacity-0 transition-opacity duration-700">
+                    🎉 Wish Granted! Happy Birthday, My Sweet Muffinn! 🎂💖✨
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-6 text-rose-400 text-xs font-medium border-t border-rose-200/50 relative z-10">
+        Forever and always keep smiling ❤️ | Dedicated to Sushii (Muffinn)
+    </footer>
+
+    <!-- YouTube API Library -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <!-- INTERACTIVE JS CODE -->
+    <script>
+        let player;
+        let isPlaying = false;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('ytPlayer', {
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            console.log("YouTube Player is ready");
+        }
+
+        function toggleMusic() {
+            const icon = document.getElementById('playIcon');
+            const text = document.getElementById('musicStatusText');
+            const notes = document.getElementById('noteAnim');
+
+            if (!isPlaying) {
+                if (player && typeof player.playVideo === 'function') {
+                    player.playVideo();
+                } else {
+                    document.getElementById('ytPlayer').contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                }
+                icon.className = 'fa-solid fa-pause';
+                text.innerText = 'Pause Music';
+                notes.classList.remove('hidden');
+                isPlaying = true;
+            } else {
+                if (player && typeof player.pauseVideo === 'function') {
+                    player.pauseVideo();
+                } else {
+                    document.getElementById('ytPlayer').contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                }
+                icon.className = 'fa-solid fa-play';
+                text.innerText = 'Play Music';
+                notes.classList.add('hidden');
+                isPlaying = false;
+            }
+        }
+
+        function flipCard(element) {
+            const inner = element.querySelector('.card-inner');
+            inner.classList.toggle('rotate-y-180');
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        const galleryImages = [
+            { src: "WhatsApp Image 2026-09-28 at 9.45.53 PM (1).jpeg", caption: "Soft & Adorable Face 💖" },
+            { src: "WhatsApp Image 2026-09-28 at 9.45.53 PM (2).jpeg", caption: "Warm Cosy Moments ☕" },
+            { src: "WhatsApp Image 2026-09-28 at 9.45.53 PM.jpeg", caption: "Utterly Beautiful ✨" },
+            { src: "WhatsApp Image 2026-09-28 at 9.45.54 PM (1).jpeg", caption: "So Incredibly Precious 🌿" },
+            { src: "WhatsApp Image 2026-09-28 at 9.45.54 PM.jpeg", caption: "Brightens Up Everything 🌺" },
+            { src: "WhatsApp Image 2026-09-28 at 10.36.11 PM.jpeg", caption: "Most Charming Smile 💕" }
+        ];
+
+        function openLightbox(index) {
+            const modal = document.getElementById('lightboxModal');
+            const img = document.getElementById('lightboxImg');
+            const caption = document.getElementById('lightboxCaption');
+
+            img.src = galleryImages[index].src;
+            caption.innerText = galleryImages[index].caption;
+            modal.classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightboxModal').classList.add('hidden');
+        }
+
+        let candleBlown = false;
+        function blowCandle() {
+            if (candleBlown) return;
+            candleBlown = true;
+
+            const flame = document.getElementById('candleFlame');
+            const wishMsg = document.getElementById('wishMessage');
+
+            flame.style.opacity = '0';
+            flame.style.transform = 'scale(0)';
+
+            wishMsg.classList.remove('opacity-0');
+
+            const duration = 3.5 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 6,
+                    angle: 60,
+                    spread: 60,
+                    origin: { x: 0 },
+                    colors: ['#FFB6C1', '#E63946', '#D4AF37', '#FFF0F5']
+                });
+                confetti({
+                    particleCount: 6,
+                    angle: 120,
+                    spread: 60,
+                    origin: { x: 1 },
+                    colors: ['#FFB6C1', '#E63946', '#D4AF37', '#FFF0F5']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            })();
+        }
+
+        function createFloatingHearts() {
+            const container = document.getElementById('heartsContainer');
+            const heartIcons = ['❤️', '💖', '🌸', '✨', '💕', '🧁'];
+
+            for (let i = 0; i < 22; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                heart.innerText = heartIcons[Math.floor(Math.random() * heartIcons.length)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = (8 + Math.random() * 8) + 's';
+                heart.style.animationDelay = (Math.random() * 5) + 's';
+                heart.style.fontSize = (16 + Math.random() * 22) + 'px';
+                container.appendChild(heart);
+            }
+        }
+
+        window.onload = function() {
+            createFloatingHearts();
+        };
+    </script>
+</body>
+</html>
